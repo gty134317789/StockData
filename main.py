@@ -8,10 +8,7 @@ import json
 
 #获取股票名称
 def get_stock_names():
-    #通过东方财富网上爬取股票的名称代码,并存入redis数据库和本地txt文档
-
-    rds = redis.from_url('redis://:666666@192.168.3.98:6379', db=1, decode_responses=True)  # 连接redis db1
-
+    #通过东方财富网上爬取股票的名称代码,存入本地txt文档
     url = "http://quote.eastmoney.com/stocklist.html"
     headers = {
         'Referer': 'http://quote.eastmoney.com/center/gridlist.html',
@@ -27,17 +24,15 @@ def get_stock_names():
             # 获取ul 下的所有的a 标签
             all_a = ul.find_all('a')
             for a in all_a:
-                # a.text 为a标签中的text数据  rpush将数据右侧插入数据库
-                rds.rpush('stock_names', a.text)
                 f.write(a.text + '\n')
 
-
+#获取股票数据
 def get_data(stocklist, outfile=r'E:\PycharmProjects\BigDataSight\stockdata'):
     headers = {
         'Referer': 'http://quotes.money.163.com/',
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'
     }
-
+    print(stocklist)
     # filelist = [os.path.splitext(file)[0] for file in os.listdir(r'E:\PycharmProjects\BigDataSight\stockdata')]
     for stock_code, stock_name in stocklist:
         # if stock_code in filelist: continue
@@ -52,7 +47,7 @@ def get_data(stocklist, outfile=r'E:\PycharmProjects\BigDataSight\stockdata'):
                     print(stock_code)
                     if not int(stock_code[:3]) in [201, 202, 203, 204]:
                         #演示报错，提前输出未知量
-                        # print(stock_code_new)
+                        print(stock_code_new)
                         stock_code_new = '1' + stock_code
                     else:
                         continue
